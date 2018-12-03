@@ -19,12 +19,11 @@ class CacheSimulator
 
     int cache_mode1; // 0/1/2 => none/split/unified
     int cache_mode2; // 0/1/2 => none/split/unified
-    int is_alloc;
+    int is_alloc;   // flag indicate whether write to cache when a write miss
     int len_addr;
     int replace_algorithm1; // replace algorithm for l1, 0/1 => LRU/RND
     int replace_algorithm2; // replace algorithm for l2, 0/1 => LRU/RND
 
-    int insn_cnt;
     std::ifstream ifs;
 
     CacheSimulator();

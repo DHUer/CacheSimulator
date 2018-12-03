@@ -1,6 +1,6 @@
 #include "simulator.h"
 
-CacheSimulator::CacheSimulator() : l1_insn(NULL), l2_insn(NULL), l1_data(NULL), l2_data(NULL), dram(NULL), insn_cnt(0)
+CacheSimulator::CacheSimulator() : l1_insn(NULL), l2_insn(NULL), l1_data(NULL), l2_data(NULL), dram(NULL)
 {
     // Configuration
     len_addr = 24;
@@ -27,8 +27,8 @@ void CacheSimulator::init()
     // Open file
     std::string filename;
     std::cout << "Filename: ";
-    // std::cin >> filename;
-    filename = "Dinero10000.din";
+    std::cin >> filename;
+    // filename = "Dinero10000.din";
     ifs.open(filename.c_str(), std::ifstream::in);
 }
 
@@ -57,7 +57,6 @@ void CacheSimulator::run()
             linkCache(&l1_insn, &l2_insn);
             head_insn->read(addr, op < 2);
         }
-        insn_cnt++;
     }
 
     output();
@@ -105,10 +104,10 @@ void CacheSimulator::createCache(Storage **insn_cache, Storage **data_cache, int
     else if (cache_mode == 2)
     { // unified
         std::cout << "Input ABC(a b c) for cache: ";
-        // std::cin >> a >> b >> c;
-        a = 1;
-        b = 32;
-        c = 8192;
+        std::cin >> a >> b >> c;
+        // a = 1;
+        // b = 32;
+        // c = 8192;
         *data_cache = *insn_cache = new Cache(a, b, c, is_alloc, replace_algorithm, len_addr);
     }
 }
@@ -132,8 +131,8 @@ void CacheSimulator::linkCache(Storage **l1, Storage **l2)
 
 void CacheSimulator::output()
 {
-
-    std::cout << "\n\nLevel 1 mode: ";
+    std::cout << "==========================================================\n";
+    std::cout << "Level 1 mode: ";
     if (cache_mode1 == 1)
     {
         std::cout << "split\n";
@@ -151,7 +150,7 @@ void CacheSimulator::output()
     else {
         std::cout << "none\n";
     }
-
+    std::cout << "==========================================================\n";
     std::cout << "Level 2 mode: ";
     if (cache_mode2 == 1)
     {
@@ -170,4 +169,5 @@ void CacheSimulator::output()
     else {
         std::cout << "none\n";
     }
+    std::cout << "==========================================================\n";
 }

@@ -44,7 +44,6 @@ void LRUSet::read(AddrInfo info, bool isData)
         }
         else
         {
-
             host->read_conflict_miss_data += res;
             host->read_capacity_miss_data += 1 - res;
         }
