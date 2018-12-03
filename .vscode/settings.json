@@ -1,0 +1,23 @@
+{
+    "files.associations": {
+        "__split_buffer": "cpp",
+        "list": "cpp",
+        "memory": "cpp",
+        "queue": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "iosfwd": "cpp",
+        "new": "cpp",
+        "ios": "cpp",
+        "iostream": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "initializer_list": "cpp",
+        "stdexcept": "cpp",
+        "type_traits": "cpp",
+        "typeinfo": "cpp",
+        "algorithm": "cpp"
+    }
+}
