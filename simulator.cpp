@@ -133,7 +133,7 @@ void CacheSimulator::linkCache(Storage **l1, Storage **l2)
 void CacheSimulator::output()
 {
 
-    std::cout << "Level 1 mode: ";
+    std::cout << "\n\nLevel 1 mode: ";
     if (cache_mode1 == 1)
     {
         std::cout << "split\n";
@@ -147,6 +147,9 @@ void CacheSimulator::output()
         std::cout << "united\n";
         std::cout << "Cache: \n";
         l1_insn->output();
+    }
+    else {
+        std::cout << "none\n";
     }
 
     std::cout << "Level 2 mode: ";
@@ -163,5 +166,8 @@ void CacheSimulator::output()
         std::cout << "united\n";
         std::cout << "Cache: \n";
         l2_insn->output();
+    }
+    else {
+        std::cout << "none\n";
     }
 }
