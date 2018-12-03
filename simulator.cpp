@@ -4,11 +4,17 @@ CacheSimulator::CacheSimulator() : l1_insn(NULL), l2_insn(NULL), l1_data(NULL), 
 {
     // Configuration
     len_addr = 24;
-    cache_mode1 = 2; // 0/1/2 => none/split/unified
-    cache_mode2 = 0; // 0/1/2 => none/split/unified
+    cache_mode1 = 1; // 0/1/2 => none/split/unified
+    cache_mode2 = 1; // 0/1/2 => none/split/unified
     is_alloc = 1;
     replace_algorithm1 = 0; // 0/1 => LRU/RND
     replace_algorithm2 = 0; // 0/1 => LRU/RND
+    /*
+    1 64 8192
+    4 64 16384
+    8 64 32768
+    16 64 65536
+    */
 }
 
 void CacheSimulator::init()
@@ -27,8 +33,9 @@ void CacheSimulator::init()
     // Open file
     std::string filename;
     std::cout << "Filename: ";
-    std::cin >> filename;
-    // filename = "Dinero10000.din";
+    //std::cin >> filename;
+    filename = "DineroFull.din";
+    std::cout << filename << "\n";
     ifs.open(filename.c_str(), std::ifstream::in);
 }
 
@@ -131,43 +138,49 @@ void CacheSimulator::linkCache(Storage **l1, Storage **l2)
 
 void CacheSimulator::output()
 {
-    std::cout << "==========================================================\n";
+    std::cout << "=======================================================================================================================\n";
     std::cout << "Level 1 mode: ";
     if (cache_mode1 == 1)
     {
-        std::cout << "split\n";
-        std::cout << "Instruction Cache: \n";
+        std::cout << "split, " << (is_alloc ? "" : "not") << "write alloc"
+                  << "\n";
+        std::cout << "Level 1 Instruction Cache: \n";
         l1_insn->output();
-        std::cout << "Data Cache: \n";
+        std::cout << "\nLevel 1 Data Cache: \n";
         l1_data->output();
     }
     else if (cache_mode1 == 2)
     {
-        std::cout << "united\n";
+        std::cout << "united, " << (is_alloc ? "" : "not") << "write alloc"
+                  << "\n";
         std::cout << "Cache: \n";
         l1_insn->output();
     }
-    else {
+    else
+    {
         std::cout << "none\n";
     }
-    std::cout << "==========================================================\n";
+    std::cout << "=======================================================================================================================\n";
     std::cout << "Level 2 mode: ";
     if (cache_mode2 == 1)
     {
-        std::cout << "split\n";
-        std::cout << "Instruction Cache: \n";
+        std::cout << "split, " << (is_alloc ? "" : "not") << "write alloc"
+                  << "\n";
+        std::cout << "Level 2 Instruction Cache: \n";
         l2_insn->output();
-        std::cout << "Data Cache: \n";
+        std::cout << "\nLevel 2 Data Cache: \n";
         l2_data->output();
     }
     else if (cache_mode2 == 2)
     {
-        std::cout << "united\n";
+        std::cout << "united, " << (is_alloc ? "" : "not") << "write alloc"
+                  << "\n";
         std::cout << "Cache: \n";
         l2_insn->output();
     }
-    else {
+    else
+    {
         std::cout << "none\n";
     }
-    std::cout << "==========================================================\n";
+    std::cout << "=======================================================================================================================\n";
 }

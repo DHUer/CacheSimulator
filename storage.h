@@ -57,7 +57,6 @@ public:
   unsigned write_capacity_miss_data;
   unsigned write_conflict_miss_data;
 
-
   std::unordered_set<unsigned> dict; // all occurred items
   std::list<unsigned> fully_associative_cache;
 
@@ -84,13 +83,10 @@ class DRAM : public Storage
 public:
   DRAM() {}
   virtual ~DRAM() {}
-  virtual void read(unsigned addr, bool isData);
-  virtual void write(unsigned addr);
-  virtual unsigned wrap(unsigned tag, unsigned index);
-  virtual void output()
-  {
-    std::cout << "we are here in DRAM\n";
-  }
+  virtual void read(unsigned addr, bool isData) {}
+  virtual void write(unsigned addr) {}
+  virtual unsigned wrap(unsigned tag, unsigned index) { return 0; }
+  virtual void output() {}
 };
 
 #endif

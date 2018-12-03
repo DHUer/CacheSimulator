@@ -17,5 +17,4 @@ class AddrInfo
         tag = _addr;
     }
 };
-
 #endif

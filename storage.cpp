@@ -88,13 +88,60 @@ unsigned Cache::update_fully_associative_cache(unsigned key, bool alloc_flag)
     return 0; // not hit
 }
 
-// ========================================================
-
-void DRAM::read(unsigned addr, bool isData) {}
-
-void DRAM::write(unsigned addr) {}
-
-unsigned DRAM::wrap(unsigned tag, unsigned index)
+void Cache::output()
 {
-    return 0;
+
+    printf("Metrics                     Total           Instrn                  Data           Read           Write            Misc\n");
+    printf("------                      -----           ------                  ----           ----           -----            ----\n");
+    printf("Demand Fetches            %7u          %7u               %7u        %7u         %7u         %7u\n",
+           read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn,
+           read_hit_insn + read_miss_insn,
+           read_hit_data + read_miss_data + write_hit_data + write_miss_data,
+           read_hit_data + read_miss_data,
+           write_hit_data + write_miss_data,
+           0);
+    printf(" Fraction of total         %.4f           %.4f                %.4f         %.4f          %.4f          %.4f\n",
+           read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn == 0 ? 0.0 : (double)(read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
+           read_hit_insn + read_miss_insn == 0 ? 0.0 : (double)(read_hit_insn + read_miss_insn) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
+           read_hit_data + read_miss_data + write_hit_data + write_miss_data == 0 ? 0.0 : (double)(read_hit_data + read_miss_data + write_hit_data + write_miss_data) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
+           read_hit_data + read_miss_data == 0 ? 0.0 : (double)(read_hit_data + read_miss_data) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
+           write_hit_data + write_miss_data == 0 ? 0.0 : (double)(write_hit_data + write_miss_data) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
+           (double)0);
+    std::cout << std::endl;
+    printf("Demand Misses             %7u          %7u               %7u        %7u         %7u         %7u\n",
+           read_miss_data + write_miss_data + read_miss_insn,
+           read_miss_insn,
+           read_miss_data + write_miss_data,
+           read_miss_data,
+           write_miss_data,
+           0);
+    printf(" Demand Misses rate        %.4f           %.4f                %.4f         %.4f          %.4f          %.4f\n",
+           read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn == 0 ? 0 : (double)(read_miss_data + write_miss_data + read_miss_insn) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
+           read_miss_insn == 0 ? 0.0 : (double)(read_miss_insn) / (read_hit_insn + read_miss_insn),
+           read_miss_data + write_miss_data == 0 ? 0.0 : (double)(read_miss_data + write_miss_data) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data),
+           read_miss_data == 0 ? 0.0 : (double)(read_miss_data) / (read_hit_data + read_miss_data),
+           write_miss_data == 0 ? 0.0 : (double)(write_miss_data) / (write_hit_data + write_miss_data),
+           0.0);
+    printf("  Compulsory misses       %7u          %7u               %7u        %7u         %7u         %7u\n",
+           read_compulsory_miss_data + read_compulsory_miss_insn + write_compulsory_miss_data,
+           read_compulsory_miss_insn,
+           read_compulsory_miss_data + write_compulsory_miss_data,
+           read_compulsory_miss_data,
+           write_compulsory_miss_data,
+           0);
+    printf("  Capacity misses         %7u          %7u               %7u        %7u         %7u         %7u\n",
+           read_capacity_miss_data + read_capacity_miss_insn + write_capacity_miss_data,
+           read_capacity_miss_insn,
+           read_capacity_miss_data + write_capacity_miss_data,
+           read_capacity_miss_data,
+           write_capacity_miss_data,
+           0);
+    printf("  Conflict misses         %7u          %7u               %7u        %7u         %7u         %7u\n",
+           read_conflict_miss_data + read_conflict_miss_insn + write_conflict_miss_data,
+           read_conflict_miss_insn,
+           read_conflict_miss_data + write_conflict_miss_data,
+           read_conflict_miss_data,
+           write_conflict_miss_data,
+           0);
 }
+// ========================================================

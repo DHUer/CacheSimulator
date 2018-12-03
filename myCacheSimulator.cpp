@@ -1,7 +1,5 @@
 #include "simulator.h"
 #include <cstdlib>
-
-
 int main(){
     CacheSimulator myCacheSimulator;
     myCacheSimulator.run();
