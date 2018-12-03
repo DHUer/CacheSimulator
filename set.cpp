@@ -33,16 +33,18 @@ void LRUSet::read(AddrInfo info, bool isData)
     }
 
     // miss in current set(cache)
+    unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
     if (isData)
     {
         host->read_miss_data++;
+
         if (host->dict.count(info.addr >> (host->len_offset)) == 0)
         {
             host->read_compulsory_miss_data++;
         }
         else
         {
-            unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
+
             host->read_conflict_miss_data += res;
             host->read_capacity_miss_data += 1 - res;
         }
@@ -56,7 +58,6 @@ void LRUSet::read(AddrInfo info, bool isData)
         }
         else
         {
-            unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
             host->read_conflict_miss_insn += res;
             host->read_capacity_miss_insn += 1 - res;
         }
@@ -113,13 +114,13 @@ void LRUSet::write(AddrInfo info, bool is_alloc)
     }
 
     host->write_miss_data++;
+    unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), is_alloc);
     if (host->dict.count(info.addr >> (host->len_offset)) == 0)
     {
         host->write_compulsory_miss_data++;
     }
     else
     {
-        unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), is_alloc);
         host->write_conflict_miss_data += res;
         host->write_capacity_miss_data += 1 - res;
     }
