@@ -3,17 +3,16 @@
 #include <vector>
 #include <iostream>
 #include "set.h"
-#include <unordered_map>
-
+#include <unordered_set>
+#include <list>
 
 class Storage
 {
 public:
   Storage *next;
-  
 
   Storage();
-  virtual ~Storage(){}
+  virtual ~Storage() {}
 
   // interfaces
   virtual void read(unsigned addr, bool isData) = 0;
@@ -58,18 +57,18 @@ public:
   unsigned write_capacity_miss_data;
   unsigned write_conflict_miss_data;
 
-  unsigned miss_id;
 
-  std::unordered_map<unsigned, unsigned> mp;
-
+  std::unordered_set<unsigned> dict; // all occurred items
+  std::list<unsigned> fully_associative_cache;
 
   std::vector<Set *> sets;
 
   Cache(unsigned a, unsigned b, unsigned c, unsigned is_alloc, unsigned replace_algorithm, unsigned len_addr);
-  virtual ~Cache(){
+  virtual ~Cache()
+  {
     for (size_t i = 0; i < sets.size(); i++)
     {
-        delete sets[i];
+      delete sets[i];
     }
   }
 
@@ -77,17 +76,19 @@ public:
   virtual void write(unsigned addr);
   virtual unsigned wrap(unsigned tag, unsigned index);
   virtual void output();
+  unsigned update_fully_associative_cache(unsigned key, bool alloc_flag);
 };
 
 class DRAM : public Storage
 {
 public:
-  DRAM(){}
-  virtual ~DRAM(){}
+  DRAM() {}
+  virtual ~DRAM() {}
   virtual void read(unsigned addr, bool isData);
   virtual void write(unsigned addr);
   virtual unsigned wrap(unsigned tag, unsigned index);
-  virtual void output() {
+  virtual void output()
+  {
     std::cout << "we are here in DRAM\n";
   }
 };

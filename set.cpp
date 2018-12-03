@@ -21,7 +21,7 @@ void LRUSet::read(AddrInfo info, bool isData)
             Line line = *it;
             lines.erase(it);
             lines.push_front(line);
-
+            host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
             if (isData)
                 host->read_hit_data++;
             else
@@ -33,49 +33,35 @@ void LRUSet::read(AddrInfo info, bool isData)
     }
 
     // miss in current set(cache)
-    host->miss_id++;
     if (isData)
     {
         host->read_miss_data++;
-        if (host->mp.count(info.addr >> (host->len_offset)) == 0)
+        if (host->dict.count(info.addr >> (host->len_offset)) == 0)
         {
             host->read_compulsory_miss_data++;
         }
         else
         {
-            int prev = host->mp[info.addr >> (host->len_offset)];
-            if (host->miss_id - prev >= host->c / host->b)
-            {
-                host->read_capacity_miss_data++;
-            }
-            else
-            {
-                host->read_conflict_miss_data++;
-            }
+            unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
+            host->read_conflict_miss_data += res;
+            host->read_capacity_miss_data += 1 - res;
         }
-        host->mp[info.addr >> (host->len_offset)] = host->miss_id;
     }
     else
     {
         host->read_miss_insn++;
-        if (host->mp.count(info.addr >> (host->len_offset)) == 0)
+        if (host->dict.count(info.addr >> (host->len_offset)) == 0)
         {
             host->read_compulsory_miss_insn++;
         }
         else
         {
-            int prev = host->mp[info.addr >> (host->len_offset)];
-            if (host->miss_id - prev >= host->c / host->b)
-            {
-                host->read_capacity_miss_insn++;
-            }
-            else
-            {
-                host->read_conflict_miss_insn++;
-            }
+            unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
+            host->read_conflict_miss_insn += res;
+            host->read_capacity_miss_insn += 1 - res;
         }
-        host->mp[info.addr >> (host->len_offset)] = host->miss_id;
     }
+    host->dict.insert(info.addr >> (host->len_offset));
 
     host->next->read(info.addr, isData);
 
@@ -92,7 +78,6 @@ void LRUSet::read(AddrInfo info, bool isData)
 
 void LRUSet::write(AddrInfo info, bool is_alloc)
 {
-
     std::list<Line>::iterator it = lines.begin();
     while (it != lines.end())
     {
@@ -103,6 +88,7 @@ void LRUSet::write(AddrInfo info, bool is_alloc)
             line.isDirty = true;
             lines.push_front(line);
             host->write_hit_data++;
+            host->update_fully_associative_cache(info.addr >> (host->len_offset), 1);
             return;
         }
         ++it;
@@ -111,7 +97,6 @@ void LRUSet::write(AddrInfo info, bool is_alloc)
     // miss in current set(cache)
     if (is_alloc)
     {
-        host->miss_id++;
         host->next->read(info.addr, true);
         Line line = lines.back();
         if (line.isDirty)
@@ -128,24 +113,20 @@ void LRUSet::write(AddrInfo info, bool is_alloc)
     }
 
     host->write_miss_data++;
-
-    if (host->mp.count(info.addr >> (host->len_offset)) == 0)
+    if (host->dict.count(info.addr >> (host->len_offset)) == 0)
     {
         host->write_compulsory_miss_data++;
     }
     else
     {
-        int prev = host->mp[info.addr >> (host->len_offset)];
-        if (host->miss_id - prev >= host->c / host->b)
-        {
-            host->write_capacity_miss_data++;
-        }
-        else
-        {
-            host->write_conflict_miss_data++;
-        }
+        unsigned res = host->update_fully_associative_cache(info.addr >> (host->len_offset), is_alloc);
+        host->write_conflict_miss_data += res;
+        host->write_capacity_miss_data += 1 - res;
     }
-    host->mp[info.addr >> (host->len_offset)] = host->miss_id;
+    if (is_alloc)
+    {
+        host->dict.insert(info.addr >> (host->len_offset));
+    }
 }
 
 void Cache::output()
