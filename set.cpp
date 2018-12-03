@@ -134,7 +134,7 @@ void Cache::output()
 {
 
     printf("Metrics                     Total           Instrn                  Data           Read           Write            Misc\n");
-    printf("------                       -----           ------                 ----           ----           -----            ----\n");
+    printf("------                      -----           ------                  ----           ----           -----            ----\n");
     printf("Demand Fetches            %7u            %5u                 %5u          %5u           %5u           %5u\n",
            read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn,
            read_hit_insn + read_miss_insn,
