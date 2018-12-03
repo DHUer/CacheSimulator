@@ -5,7 +5,7 @@
 #include "addrinfo.h"
 #include "line.h"
 
-class Storage;
+class Cache;
 
 class Set
 {
@@ -13,8 +13,8 @@ class Set
 
     size_t cap;
     unsigned index;
-    Storage *host;
-    Set(size_t _cap, Storage *host, unsigned index);
+    Cache *host;
+    Set(size_t _cap, Cache *host, unsigned index);
     virtual ~Set(){}
     virtual void read(AddrInfo info, bool isData) = 0;
     virtual void write(AddrInfo info, bool is_write_back) = 0;
@@ -24,7 +24,7 @@ class LRUSet : public Set
 {
   public:
     std::list<Line> lines;
-    LRUSet(size_t _cap, Storage *host, unsigned index);
+    LRUSet(size_t _cap, Cache *host, unsigned index);
     virtual ~LRUSet(){}
     virtual void read(AddrInfo info, bool isData);
     virtual void write(AddrInfo info, bool is_write_back);

@@ -1,7 +1,7 @@
 #include "storage.h"
 
 // ========================================================
-Storage::Storage() : next(NULL), read_hit_data(0), read_miss_data(0), read_hit_insn(0), read_miss_insn(0), write_hit_data(0), write_miss_data(0) {}
+Storage::Storage() : next(NULL) {}
 
 unsigned Storage::len(unsigned num)
 {
@@ -15,7 +15,7 @@ void Storage::set_next(Storage *next_storage)
 
 // ========================================================
 
-Cache::Cache(unsigned a, unsigned b, unsigned c, unsigned is_alloc, unsigned replace_algorithm, unsigned len_addr) : a(a), b(b), c(c), is_alloc(is_alloc), replace_algorithm(replace_algorithm), len_addr(len_addr)
+Cache::Cache(unsigned a, unsigned b, unsigned c, unsigned is_alloc, unsigned replace_algorithm, unsigned len_addr) : a(a), b(b), c(c), is_alloc(is_alloc), replace_algorithm(replace_algorithm), len_addr(len_addr), read_hit_data(0), read_miss_data(0), read_compulsory_miss_data(0), read_capacity_miss_data(0), read_conflict_miss_data(0), read_hit_insn(0), read_miss_insn(0), read_compulsory_miss_insn(0), read_capacity_miss_insn(0), read_conflict_miss_insn(0), write_hit_data(0), write_miss_data(0), write_compulsory_miss_data(0), write_capacity_miss_data(0), write_conflict_miss_data(0), miss_id(0)
 {
     if (a == 0)
         a = c / b;

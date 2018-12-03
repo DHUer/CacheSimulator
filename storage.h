@@ -3,17 +3,14 @@
 #include <vector>
 #include <iostream>
 #include "set.h"
+#include <unordered_map>
+
 
 class Storage
 {
 public:
   Storage *next;
-  unsigned read_hit_data;
-  unsigned read_miss_data;
-  unsigned read_hit_insn;
-  unsigned read_miss_insn;
-  unsigned write_hit_data;
-  unsigned write_miss_data;
+  
 
   Storage();
   virtual ~Storage(){}
@@ -22,9 +19,7 @@ public:
   virtual void read(unsigned addr, bool isData) = 0;
   virtual void write(unsigned addr) = 0;
   virtual unsigned wrap(unsigned tag, unsigned index) = 0;
-  virtual void output(){
-    std::cout << "we are here in Storage \n";
-  };
+  virtual void output() = 0;
 
   // necessary functions
   unsigned len(unsigned);
@@ -45,6 +40,27 @@ public:
   unsigned len_index;
   unsigned len_offset;
 
+  unsigned read_hit_data;
+  unsigned read_miss_data;
+  unsigned read_compulsory_miss_data;
+  unsigned read_capacity_miss_data;
+  unsigned read_conflict_miss_data;
+
+  unsigned read_hit_insn;
+  unsigned read_miss_insn;
+  unsigned read_compulsory_miss_insn;
+  unsigned read_capacity_miss_insn;
+  unsigned read_conflict_miss_insn;
+
+  unsigned write_hit_data;
+  unsigned write_miss_data;
+  unsigned write_compulsory_miss_data;
+  unsigned write_capacity_miss_data;
+  unsigned write_conflict_miss_data;
+
+  unsigned miss_id;
+
+  std::unordered_map<unsigned, unsigned> mp;
 
 
   std::vector<Set *> sets;

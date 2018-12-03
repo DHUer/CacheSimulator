@@ -2,11 +2,11 @@
 #include <iostream>
 #include <cstdio>
 
-Set::Set(size_t _cap, Storage *host, unsigned index) : cap(_cap), host(host), index(index) {}
+Set::Set(size_t _cap, Cache *host, unsigned index) : cap(_cap), host(host), index(index) {}
 
 // ========================================================
 
-LRUSet::LRUSet(size_t _cap, Storage *host, unsigned index) : Set(_cap, host, index)
+LRUSet::LRUSet(size_t _cap, Cache *host, unsigned index) : Set(_cap, host, index)
 {
     lines.resize(cap, Line());
 }
@@ -33,10 +33,49 @@ void LRUSet::read(AddrInfo info, bool isData)
     }
 
     // miss in current set(cache)
+    host->miss_id++;
     if (isData)
+    {
         host->read_miss_data++;
+        if (host->mp.count(info.addr >> (host->len_offset)) == 0)
+        {
+            host->read_compulsory_miss_data++;
+        }
+        else
+        {
+            int prev = host->mp[info.addr >> (host->len_offset)];
+            if (host->miss_id - prev >= host->c / host->b)
+            {
+                host->read_capacity_miss_data++;
+            }
+            else
+            {
+                host->read_conflict_miss_data++;
+            }
+        }
+        host->mp[info.addr >> (host->len_offset)] = host->miss_id;
+    }
     else
+    {
         host->read_miss_insn++;
+        if (host->mp.count(info.addr >> (host->len_offset)) == 0)
+        {
+            host->read_compulsory_miss_insn++;
+        }
+        else
+        {
+            int prev = host->mp[info.addr >> (host->len_offset)];
+            if (host->miss_id - prev >= host->c / host->b)
+            {
+                host->read_capacity_miss_insn++;
+            }
+            else
+            {
+                host->read_conflict_miss_insn++;
+            }
+        }
+        host->mp[info.addr >> (host->len_offset)] = host->miss_id;
+    }
 
     host->next->read(info.addr, isData);
 
@@ -70,10 +109,9 @@ void LRUSet::write(AddrInfo info, bool is_alloc)
     }
 
     // miss in current set(cache)
-    host->write_miss_data++;
-
     if (is_alloc)
     {
+        host->miss_id++;
         host->next->read(info.addr, true);
         Line line = lines.back();
         if (line.isDirty)
@@ -88,11 +126,31 @@ void LRUSet::write(AddrInfo info, bool is_alloc)
     {
         host->next->write(info.addr);
     }
+
+    host->write_miss_data++;
+
+    if (host->mp.count(info.addr >> (host->len_offset)) == 0)
+    {
+        host->write_compulsory_miss_data++;
+    }
+    else
+    {
+        int prev = host->mp[info.addr >> (host->len_offset)];
+        if (host->miss_id - prev >= host->c / host->b)
+        {
+            host->write_capacity_miss_data++;
+        }
+        else
+        {
+            host->write_conflict_miss_data++;
+        }
+    }
+    host->mp[info.addr >> (host->len_offset)] = host->miss_id;
 }
 
 void Cache::output()
 {
-    
+
     printf("Metrics                      Total           Instrn                 Data            Read           Write            Misc\n");
     printf("------                       -----           ------                 ----            ----           -----            ----\n");
     printf("Demand Fetches            %7u            %5u                 %5u          %5u           %5u           %5u\n",
@@ -102,7 +160,7 @@ void Cache::output()
            read_hit_data + read_miss_data,
            write_hit_data + write_miss_data,
            0);
-    printf("Fraction of total          %.4f           %.4f                %.4f         %.4f          %.4f          %.4f\n",
+    printf(" Fraction of total         %.4f           %.4f                %.4f         %.4f          %.4f          %.4f\n",
            (double)(read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
            (double)(read_hit_insn + read_miss_insn) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
            (double)(read_hit_data + read_miss_data + write_hit_data + write_miss_data) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
@@ -117,12 +175,33 @@ void Cache::output()
            read_miss_data,
            write_miss_data,
            0);
-    printf("Demand Misses rate         %.4f           %.4f                %.4f         %.4f          %.4f          %.4f\n",
+    printf(" Demand Misses rate        %.4f           %.4f                %.4f         %.4f          %.4f          %.4f\n",
            (double)(read_miss_data + write_miss_data + read_miss_insn) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data + read_hit_insn + read_miss_insn),
            (double)(read_miss_insn) / (read_hit_insn + read_miss_insn),
            (double)(read_miss_data + write_miss_data) / (read_hit_data + read_miss_data + write_hit_data + write_miss_data),
            (double)(read_miss_data) / (read_hit_data + read_miss_data),
            (double)(write_miss_data) / (write_hit_data + write_miss_data),
            0.0);
+    printf("  Compulsory misses       %7u            %5u                 %5u          %5u           %5u           %5u\n",
+           read_compulsory_miss_data + read_compulsory_miss_insn + write_compulsory_miss_data,
+           read_compulsory_miss_insn,
+           read_compulsory_miss_data + write_compulsory_miss_data,
+           read_compulsory_miss_data,
+           write_compulsory_miss_data,
+           0);
+    printf("  Capacity misses         %7u            %5u                 %5u          %5u           %5u           %5u\n",
+           read_capacity_miss_data + read_capacity_miss_insn + write_capacity_miss_data,
+           read_capacity_miss_insn,
+           read_capacity_miss_data + write_capacity_miss_data,
+           read_capacity_miss_data,
+           write_capacity_miss_data,
+           0);
+    printf("  Conflict misses         %7u            %5u                 %5u          %5u           %5u           %5u\n",
+           read_conflict_miss_data + read_conflict_miss_insn + write_conflict_miss_data,
+           read_conflict_miss_insn,
+           read_conflict_miss_data + write_conflict_miss_data,
+           read_conflict_miss_data,
+           write_conflict_miss_data,
+           0);
 }
 // ========================================================
