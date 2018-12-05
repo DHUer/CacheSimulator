@@ -2,3 +2,4 @@
 *~
 *.o
 myCacheSimulator
+.DS_Store
